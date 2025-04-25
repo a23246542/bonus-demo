@@ -33,11 +33,45 @@ const AnimationDemo: React.FC = () => {
       <div style={{ position: "relative" }}>
         <BonusBackground isVisible={isPlaying} />
         <LottieOverlay isVisible={isPlaying} />
-      </div>
-      {/* 骰子與金額顯示 */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
-        <DiceGroup isVisible={isPlaying} />
-        <AmountDisplay isVisible={isPlaying} />
+
+        {/* 骰子與金額顯示 - 絕對定位於特定位置 */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {/* 骰子在金色骰盅內位置 */}
+          <div
+            style={{
+              marginTop: "30%", // 調整骰子垂直位置
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <DiceGroup isVisible={isPlaying} />
+          </div>
+
+          {/* 金幣數字在紫色背景區塊 */}
+          <div
+            style={{
+              marginTop: "5%", // 金幣與骰子間距
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <AmountDisplay isVisible={isPlaying} />
+          </div>
+        </div>
       </div>
     </div>
   );

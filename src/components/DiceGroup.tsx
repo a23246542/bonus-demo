@@ -7,15 +7,16 @@ interface DiceGroupProps {
 }
 
 const diceVariants: Variants = {
-  hidden: { opacity: 0, x: 50 },
+  hidden: { opacity: 0, y: -20, scale: 0.8 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: { delay: 0.7, duration: 0.3, ease: "easeOut" },
+    y: 0,
+    scale: 1,
+    transition: { delay: 0.7, duration: 0.4, ease: "easeOut" },
   },
 };
 
-/** 骰子組，淡入並滑入 */
+/** 骰子組，淡入並從上方滑入，放置在金色骰盅內 */
 const DiceGroup: React.FC<DiceGroupProps> = ({ isVisible }) => (
   <motion.img
     src={diceGroupSrc}
@@ -23,7 +24,12 @@ const DiceGroup: React.FC<DiceGroupProps> = ({ isVisible }) => (
     initial="hidden"
     animate={isVisible ? "visible" : "hidden"}
     variants={diceVariants}
-    style={{ width: 100, marginRight: 16 }}
+    style={{
+      width: 100,
+      marginBottom: 16,
+      position: "relative",
+      top: "10px", // 微調骰子在盅內的垂直位置
+    }}
   />
 );
 

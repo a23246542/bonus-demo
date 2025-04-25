@@ -7,15 +7,16 @@ interface AmountDisplayProps {
 }
 
 const amountVariants: Variants = {
-  hidden: { opacity: 0, x: -50 },
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: { delay: 0.9, duration: 0.3, ease: "easeOut" },
+    y: 0,
+    scale: 1,
+    transition: { delay: 0.9, duration: 0.4, ease: "easeOut" },
   },
 };
 
-/** 金額顯示，淡入並滑入 */
+/** 金額顯示，淡入並從下方滑入，位於紫色背景區塊 */
 const AmountDisplay: React.FC<AmountDisplayProps> = ({ isVisible }) => (
   <motion.img
     src={amountSrc}
@@ -23,7 +24,11 @@ const AmountDisplay: React.FC<AmountDisplayProps> = ({ isVisible }) => (
     initial="hidden"
     animate={isVisible ? "visible" : "hidden"}
     variants={amountVariants}
-    style={{ width: 100 }}
+    style={{
+      width: 180,
+      position: "relative",
+      top: "40px", // 調整位置至紫色背景區塊
+    }}
   />
 );
 
