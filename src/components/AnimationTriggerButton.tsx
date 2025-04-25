@@ -16,6 +16,7 @@ const AnimationTriggerButton: React.FC<AnimationTriggerButtonProps> = ({
     aria-label="觸發動畫"
     style={{
       padding: "0.5rem 1rem",
+      marginBottom: "4rem",
       fontSize: "1rem",
       cursor: disabled ? "not-allowed" : "pointer",
       borderRadius: "4px",

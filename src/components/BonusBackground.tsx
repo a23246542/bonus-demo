@@ -4,6 +4,7 @@ import bonusBgSrc from "../assets/bonus-bg.png";
 
 interface BonusBackgroundProps {
   isVisible: boolean;
+  onAnimationComplete?: () => void;
 }
 
 const backgroundVariants: Variants = {
@@ -11,12 +12,15 @@ const backgroundVariants: Variants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.3, ease: "easeOut" }, // 縮短動畫時間
   },
 };
 
 /** 主背景縮放淡入 */
-const BonusBackground: React.FC<BonusBackgroundProps> = ({ isVisible }) => (
+const BonusBackground: React.FC<BonusBackgroundProps> = ({
+  isVisible,
+  onAnimationComplete,
+}) => (
   <motion.img
     src={bonusBgSrc}
     alt="主背景"
@@ -24,6 +28,7 @@ const BonusBackground: React.FC<BonusBackgroundProps> = ({ isVisible }) => (
     animate={isVisible ? "visible" : "hidden"}
     variants={backgroundVariants}
     style={{ width: "100%", maxWidth: 400 }}
+    onAnimationComplete={isVisible ? onAnimationComplete : undefined}
   />
 );
 

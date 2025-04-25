@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import AnimationTriggerButton from "./AnimationTriggerButton";
 import ApertureEffect from "./ApertureEffect";
 import BonusBackground from "./BonusBackground";
@@ -7,30 +7,140 @@ import DiceGroup from "./DiceGroup";
 import AmountDisplay from "./AmountDisplay";
 
 /**
- * AnimationDemo: 整合多層動畫的主要元件
+ * 動畫階段列舉
+ */
+enum AnimationStage {
+  IDLE = "idle",
+  BACKGROUND = "background", // 改名為 BACKGROUND，同時顯示光圈和背景
+  DICE = "dice",
+  LOTTIE = "lottie",
+  AMOUNT = "amount",
+  COMPLETE = "complete",
+}
+
+/**
+ * AnimationDemo: 整合多層動畫的主要元件，使用狀態管理控制動畫序列
  */
 const AnimationDemo: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  // 追蹤骰子是否已經顯示
-  const [isDiceVisible, setIsDiceVisible] = useState(false);
+  // 動畫階段狀態
+  const [stage, setStage] = useState<AnimationStage>(AnimationStage.IDLE);
+  // 是否已經偵測到狀態變更的除錯狀態
+  const [stageChangeDetected, setStageChangeDetected] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-  const handleTrigger = (): void => {
-    setIsPlaying(true);
-    // 重設骰子顯示狀態
-    setIsDiceVisible(false);
-  };
-
-  // 監聽 isPlaying 狀態，設定延遲來追蹤骰子顯示時間
+  // 追蹤狀態變化
   useEffect(() => {
-    if (isPlaying) {
-      // 骰子動畫有 0.7 秒延遲 + 0.4 秒動畫時間，所以設定稍微長一點延遲確保骰子完全顯示
+    if (stage !== AnimationStage.IDLE) {
+      console.log(`動畫階段變更: ${stage}`);
+    }
+  }, [stage]);
+
+  // 是否處於播放中狀態
+  const isPlaying =
+    stage !== AnimationStage.IDLE && stage !== AnimationStage.COMPLETE;
+
+  // 各元件顯示狀態檢查，修改為光圈和背景同時出現
+  const shouldShowApertureAndBackground = stage !== AnimationStage.IDLE;
+  const shouldShowDice =
+    stage !== AnimationStage.IDLE && stage !== AnimationStage.BACKGROUND;
+  const shouldShowLottie =
+    stage === AnimationStage.LOTTIE ||
+    stage === AnimationStage.AMOUNT ||
+    stage === AnimationStage.COMPLETE;
+  const shouldShowAmount =
+    stage === AnimationStage.AMOUNT || stage === AnimationStage.COMPLETE;
+
+  // 處理觸發按鈕點擊
+  const handleTrigger = useCallback((): void => {
+    // 重設動畫階段，直接進入 BACKGROUND 階段
+    setStage(AnimationStage.BACKGROUND);
+    // 重設階段變更偵測狀態
+    setStageChangeDetected({});
+  }, []);
+
+  // 添加安全機制，確保即使回調未觸發，動畫也能繼續進行
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    // 用於每個階段的計時器，如果階段停滯過久，強制進入下一階段
+    const stageTimeouts = {
+      [AnimationStage.BACKGROUND]: 500, // 背景和光圈共用一個階段
+      [AnimationStage.DICE]: 700,
+      [AnimationStage.LOTTIE]: 1000,
+      [AnimationStage.AMOUNT]: 800,
+    };
+
+    // 如果當前階段有設置超時時間且未曾偵測到變化
+    if (stageTimeouts[stage] && !stageChangeDetected[stage]) {
       const timer = setTimeout(() => {
-        setIsDiceVisible(true);
-      }, 1200); // 1.2 秒後骰子應該已完全顯示
+        // 記錄已經處理過這個階段
+        setStageChangeDetected((prev) => ({ ...prev, [stage]: true }));
+
+        // 根據當前階段決定下一個階段
+        switch (stage) {
+          case AnimationStage.BACKGROUND:
+            setStage(AnimationStage.DICE);
+            break;
+          case AnimationStage.DICE:
+            setStage(AnimationStage.LOTTIE);
+            break;
+          case AnimationStage.LOTTIE:
+            setStage(AnimationStage.AMOUNT);
+            break;
+          case AnimationStage.AMOUNT:
+            setStage(AnimationStage.COMPLETE);
+            break;
+        }
+      }, stageTimeouts[stage]);
 
       return () => clearTimeout(timer);
     }
-  }, [isPlaying]);
+  }, [stage, isPlaying, stageChangeDetected]);
+
+  // 背景和光圈動畫完成處理
+  const handleBackgroundComplete = useCallback(() => {
+    if (stage === AnimationStage.BACKGROUND) {
+      setStage(AnimationStage.DICE);
+      setStageChangeDetected((prev) => ({
+        ...prev,
+        [AnimationStage.BACKGROUND]: true,
+      }));
+    }
+  }, [stage]);
+
+  // 骰子動畫完成處理
+  const handleDiceComplete = useCallback(() => {
+    if (stage === AnimationStage.DICE) {
+      setStage(AnimationStage.LOTTIE);
+      setStageChangeDetected((prev) => ({
+        ...prev,
+        [AnimationStage.DICE]: true,
+      }));
+    }
+  }, [stage]);
+
+  // Lottie動畫完成處理
+  const handleLottieComplete = useCallback(() => {
+    if (stage === AnimationStage.LOTTIE) {
+      setStage(AnimationStage.AMOUNT);
+      setStageChangeDetected((prev) => ({
+        ...prev,
+        [AnimationStage.LOTTIE]: true,
+      }));
+    }
+  }, [stage]);
+
+  // 金額顯示動畫完成處理
+  const handleAmountComplete = useCallback(() => {
+    if (stage === AnimationStage.AMOUNT) {
+      setStage(AnimationStage.COMPLETE);
+      setStageChangeDetected((prev) => ({
+        ...prev,
+        [AnimationStage.AMOUNT]: true,
+      }));
+    }
+  }, [stage]);
 
   return (
     <div
@@ -43,13 +153,25 @@ const AnimationDemo: React.FC = () => {
       }}
     >
       <AnimationTriggerButton onClick={handleTrigger} disabled={isPlaying} />
-      {/* 光圈效果 - 現在只在動畫播放時顯示 */}
-      <ApertureEffect isVisible={isPlaying} />
+
+      {/* 光圈效果 */}
+      <ApertureEffect
+        isVisible={shouldShowApertureAndBackground}
+        onAnimationComplete={undefined} // 不再需要光圈完成回調
+      />
+
       {/* 背景與 Lottie 疊加 */}
       <div style={{ position: "relative" }}>
-        <BonusBackground isVisible={isPlaying} />
-        {/* Lottie 動畫現在只在骰子顯示後才會播放 */}
-        <LottieOverlay isVisible={isDiceVisible} />
+        <BonusBackground
+          isVisible={shouldShowApertureAndBackground}
+          onAnimationComplete={handleBackgroundComplete}
+        />
+
+        {/* Lottie 動畫僅在骰子顯示後播放 */}
+        <LottieOverlay
+          isVisible={shouldShowLottie}
+          onAnimationComplete={handleLottieComplete}
+        />
 
         {/* 骰子與金額顯示 - 絕對定位於特定位置 */}
         <div
@@ -74,7 +196,10 @@ const AnimationDemo: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            <DiceGroup isVisible={isPlaying} />
+            <DiceGroup
+              isVisible={shouldShowDice}
+              onAnimationComplete={handleDiceComplete}
+            />
           </div>
 
           {/* 金幣數字在紫色背景區塊 */}
@@ -86,7 +211,10 @@ const AnimationDemo: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            <AmountDisplay isVisible={isPlaying} />
+            <AmountDisplay
+              isVisible={shouldShowAmount}
+              onAnimationComplete={handleAmountComplete}
+            />
           </div>
         </div>
       </div>

@@ -1,9 +1,10 @@
 import React from "react";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, AnimationControls } from "framer-motion";
 import diceGroupSrc from "../assets/dice-group.png";
 
 interface DiceGroupProps {
   isVisible: boolean;
+  onAnimationComplete?: () => void;
 }
 
 const diceVariants: Variants = {
@@ -12,12 +13,15 @@ const diceVariants: Variants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { delay: 0.7, duration: 0.4, ease: "easeOut" },
+    transition: { delay: 0.3, duration: 0.3, ease: "easeOut" }, // 延遲和持續時間縮短
   },
 };
 
 /** 骰子組，淡入並從上方滑入，放置在金色骰盅內 */
-const DiceGroup: React.FC<DiceGroupProps> = ({ isVisible }) => (
+const DiceGroup: React.FC<DiceGroupProps> = ({
+  isVisible,
+  onAnimationComplete,
+}) => (
   <motion.img
     src={diceGroupSrc}
     alt="骰子"
@@ -30,6 +34,7 @@ const DiceGroup: React.FC<DiceGroupProps> = ({ isVisible }) => (
       position: "relative",
       top: "10px", // 微調骰子在盅內的垂直位置
     }}
+    onAnimationComplete={isVisible ? onAnimationComplete : undefined}
   />
 );
 
