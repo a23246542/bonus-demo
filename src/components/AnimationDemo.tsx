@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AnimationTriggerButton from "./AnimationTriggerButton";
 import ApertureEffect from "./ApertureEffect";
 import BonusBackground from "./BonusBackground";
@@ -11,10 +11,26 @@ import AmountDisplay from "./AmountDisplay";
  */
 const AnimationDemo: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  // 追蹤骰子是否已經顯示
+  const [isDiceVisible, setIsDiceVisible] = useState(false);
 
   const handleTrigger = (): void => {
     setIsPlaying(true);
+    // 重設骰子顯示狀態
+    setIsDiceVisible(false);
   };
+
+  // 監聽 isPlaying 狀態，設定延遲來追蹤骰子顯示時間
+  useEffect(() => {
+    if (isPlaying) {
+      // 骰子動畫有 0.7 秒延遲 + 0.4 秒動畫時間，所以設定稍微長一點延遲確保骰子完全顯示
+      const timer = setTimeout(() => {
+        setIsDiceVisible(true);
+      }, 1200); // 1.2 秒後骰子應該已完全顯示
+
+      return () => clearTimeout(timer);
+    }
+  }, [isPlaying]);
 
   return (
     <div
@@ -32,7 +48,8 @@ const AnimationDemo: React.FC = () => {
       {/* 背景與 Lottie 疊加 */}
       <div style={{ position: "relative" }}>
         <BonusBackground isVisible={isPlaying} />
-        <LottieOverlay isVisible={isPlaying} />
+        {/* Lottie 動畫現在只在骰子顯示後才會播放 */}
+        <LottieOverlay isVisible={isDiceVisible} />
 
         {/* 骰子與金額顯示 - 絕對定位於特定位置 */}
         <div
