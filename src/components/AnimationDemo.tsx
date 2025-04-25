@@ -27,8 +27,8 @@ const AnimationDemo: React.FC = () => {
       }}
     >
       <AnimationTriggerButton onClick={handleTrigger} disabled={isPlaying} />
-      {/* 光圈效果 */}
-      <ApertureEffect />
+      {/* 光圈效果 - 現在只在動畫播放時顯示 */}
+      <ApertureEffect isVisible={isPlaying} />
       {/* 背景與 Lottie 疊加 */}
       <div style={{ position: "relative" }}>
         <BonusBackground isVisible={isPlaying} />
