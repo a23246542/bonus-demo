@@ -49,7 +49,7 @@ const LottieOverlay: React.FC<LottieOverlayProps> = ({
         pointerEvents: "none",
       }}
       onLoad={handleAnimationStart}
-      onComplete={handleAnimationComplete}
+      // onComplete={handleAnimationComplete}
       onError={() => setHasError(true)}
     />
   );
