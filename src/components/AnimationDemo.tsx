@@ -160,7 +160,7 @@ const AnimationDemo: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            top: 0,
+            top: "-25px",
             left: 0,
             width: "100%",
             height: "100%",
@@ -219,7 +219,7 @@ const AnimationDemo: React.FC = () => {
             {/* 金幣數字在紫色背景區塊 */}
             <div
               style={{
-                // marginTop: "5%", // 金幣與骰子間距
+                marginTop: "3%", // 金幣與骰子間距
                 width: "100%",
                 display: "flex",
                 justifyContent: "center",

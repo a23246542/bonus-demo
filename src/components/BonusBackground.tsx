@@ -27,7 +27,7 @@ const BonusBackground: React.FC<BonusBackgroundProps> = ({
     initial="hidden"
     animate={isVisible ? "visible" : "hidden"}
     variants={backgroundVariants}
-    style={{ width: "100%", maxWidth: 400 }}
+    style={{ width: "80%", maxWidth: 400 }}
     onAnimationComplete={isVisible ? onAnimationComplete : undefined}
   />
 );
