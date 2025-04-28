@@ -48,7 +48,6 @@ const ApertureEffect: React.FC<ApertureEffectProps> = ({
         left: "-15%",
         width: "130%",
         maxWidth: 520,
-        zIndex: -1,
       }}
     />
   );
