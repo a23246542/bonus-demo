@@ -99,3 +99,44 @@
 .read-the-docs {
   color: #888;
 }
+
+/* ProjectilePlayground 元件樣式 */
+.projectile-canvas {
+  border: 1px solid #ccc;
+  background: #fdfdfd;
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 1rem;
+}
+.controls label,
+.controls output {
+  color: #fff;
+}
+.controls label {
+  text-align: center;
+  margin: 0.5rem;
+}
+.controls label > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.controls input[type="range"] {
+  width: 160px;
+}
+.controls button {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.controls output {
+  min-width: 3.5rem;
+  text-align: right;
+  font-weight: 600;
+}
