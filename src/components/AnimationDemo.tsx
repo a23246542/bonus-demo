@@ -6,6 +6,7 @@ import BonusBackground from "./BonusBackground";
 import LottieOverlay from "./LottieOverlay";
 import DiceGroup from "./DiceGroup";
 import AmountDisplay from "./AmountDisplay";
+import jackpotBg from "../assets/JACKPOT.jpg"; // 引入背景圖片
 
 /**
  * 動畫階段列舉
@@ -143,27 +144,54 @@ const AnimationDemo: React.FC = () => {
     }
   }, [stage]);
 
+  const appStyle = {
+    backgroundImage: `url(${jackpotBg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  };
+
   return (
     <div
-      style={{
-        position: "relative",
-        width: "100%",
-        maxWidth: 400,
-        margin: "2rem auto",
-        textAlign: "center",
-      }}
+      className="AnimationDemo w-full max-w-[390px] mx-auto h-[844px] overflow-hidden  relative"
+      style={appStyle}
+      // style={{
+      //   position: "relative",
+      //   width: "100%",
+      //   maxWidth: 400,
+      //   margin: "2rem auto",
+      //   textAlign: "center",
+      // }}
     >
-      <AnimationTriggerButton onClick={handleTrigger} disabled={isPlaying} />
+      {/* <AnimationTriggerButton onClick={handleTrigger} disabled={isPlaying} cla /> */}
+      <button
+        onClick={handleTrigger}
+        disabled={isPlaying}
+        aria-label="觸發動畫"
+        className="absolute top-20 left-0 right-0 mx-auto z-10"
+        style={{
+          width: "120px",
+          padding: "0.5rem 1rem",
+          marginBottom: "4rem",
+          fontSize: "1rem",
+          cursor: isPlaying ? "not-allowed" : "pointer",
+          borderRadius: "4px",
+        }}
+      >
+        開始動畫
+      </button>
 
       {/* 主要動畫容器，確保元件層級正確 */}
-      {createPortal(
-        <div style={{ position: "relative" }}>
+      {
+        <div className="container absolute top-0 left-0 right-0 bottom-0 outline outline-1 outline-red-600">
           {/* 光圈效果 - 放在最底層 */}
           <div
+            className="top-150"
             style={{
               position: "absolute",
-              top: "-25px",
+              // top: 0,
               left: 0,
+              right: 0,
+              bottom: 0,
               width: "100%",
               height: "100%",
               zIndex: 1, // 確保光圈在最底層
@@ -176,8 +204,12 @@ const AnimationDemo: React.FC = () => {
           </div>
 
           {/* 背景容器 */}
-          <div style={{ position: "relative", zIndex: 2 }}>
+          <div
+            className="absolute w-285 h-382 top-250 left-0 right-0 bottom-0 mx-auto"
+            style={{ position: "relative", zIndex: 2 }}
+          >
             <BonusBackground
+              className="absolute top-0 left-0 right-0  mx-auto"
               isVisible={shouldShowApertureAndBackground}
               onAnimationComplete={handleBackgroundComplete}
             />
@@ -189,54 +221,39 @@ const AnimationDemo: React.FC = () => {
             />
 
             {/* 骰子與金額顯示 - 絕對定位於特定位置 */}
+            {/* 骰子在金色骰盅內位置 */}
             <div
+              className="DiceGroup absolute top-122 left-0 right-0  mx-auto"
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                pointerEvents: "none",
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                zIndex: 3, // 確保在最上層
+                justifyContent: "center",
               }}
             >
-              {/* 骰子在金色骰盅內位置 */}
-              <div
-                style={{
-                  marginTop: "36%", // 調整骰子垂直位置
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <DiceGroup
-                  isVisible={shouldShowDice}
-                  onAnimationComplete={handleDiceComplete}
-                />
-              </div>
+              <DiceGroup
+                isVisible={shouldShowDice}
+                onAnimationComplete={handleDiceComplete}
+              />
+            </div>
 
-              {/* 金幣數字在紫色背景區塊 */}
-              <div
-                style={{
-                  marginTop: "3%", // 金幣與骰子間距
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <AmountDisplay
-                  isVisible={shouldShowAmount}
-                  onAnimationComplete={handleAmountComplete}
-                />
-              </div>
+            {/* 金幣數字在紫色背景區塊 */}
+            <div
+              className="absolute top-245 left-0 right-0  mx-auto"
+              style={{
+                // marginTop: "3%", // 金幣與骰子間距
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <AmountDisplay
+                isVisible={shouldShowAmount}
+                onAnimationComplete={handleAmountComplete}
+              />
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        </div>
+        // document.body
+      }
     </div>
   );
 };

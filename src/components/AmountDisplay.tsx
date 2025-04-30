@@ -22,19 +22,22 @@ const AmountDisplay: React.FC<AmountDisplayProps> = ({
   isVisible,
   onAnimationComplete,
 }) => (
-  <motion.img
-    src={amountSrc}
-    alt="金額顯示"
-    initial="hidden"
-    animate={isVisible ? "visible" : "hidden"}
-    variants={amountVariants}
-    style={{
-      width: 180,
-      position: "relative",
-      top: "40px", // 調整位置至紫色背景區塊
-    }}
-    onAnimationComplete={isVisible ? onAnimationComplete : undefined}
-  />
+  <div
+    className="AmountDisplay w-241 h-65"
+    style={{ display: isVisible ? "block" : "none" }}
+  >
+    <motion.img
+      src={amountSrc}
+      alt="金額顯示"
+      initial="hidden"
+      animate={isVisible ? "visible" : "hidden"}
+      variants={amountVariants}
+      // className="w-168 h-26 object-cover"
+      className="w-168 object-cover"
+      style={{}}
+      onAnimationComplete={isVisible ? onAnimationComplete : undefined}
+    />
+  </div>
 );
 
 export default AmountDisplay;

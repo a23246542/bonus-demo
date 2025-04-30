@@ -28,11 +28,13 @@ const DiceGroup: React.FC<DiceGroupProps> = ({
     initial="hidden"
     animate={isVisible ? "visible" : "hidden"}
     variants={diceVariants}
+    // className="w-107 h-72 object-cover"
+    className="w-107 h-72 object-cover"
     style={{
-      width: 100,
-      marginBottom: 16,
+      // width: 100,
+      // marginBottom: 16,
       position: "relative",
-      top: "10px", // 微調骰子在盅內的垂直位置
+      // top: "10px", // 微調骰子在盅內的垂直位置
     }}
     onAnimationComplete={isVisible ? onAnimationComplete : undefined}
   />

@@ -37,18 +37,21 @@ const ApertureEffect: React.FC<ApertureEffectProps> = ({
         opacity: { duration: 0.3, ease: "easeOut" },
         scale: { duration: 0.3, ease: "easeOut" },
         rotate: {
-          repeat: Infinity,
+          // repeat: Infinity,
           duration: 3, // 加快旋轉
           ease: "linear",
         },
       }}
-      style={{
-        position: "absolute",
-        top: "-15%",
-        left: "-15%",
-        width: "130%",
-        maxWidth: 520,
-      }}
+      className={"w-550 h-550 object-cover"}
+      style={
+        {
+          // position: "absolute",
+          // top: "-15%",
+          // left: "-15%",
+          // width: "130%",
+          // maxWidth: 520,
+        }
+      }
     />
   );
 };

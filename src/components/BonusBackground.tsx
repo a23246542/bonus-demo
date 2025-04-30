@@ -5,6 +5,7 @@ import bonusBgSrc from "../assets/bonus-bg.png";
 interface BonusBackgroundProps {
   isVisible: boolean;
   onAnimationComplete?: () => void;
+  className?: string;
 }
 
 const backgroundVariants: Variants = {
@@ -20,6 +21,7 @@ const backgroundVariants: Variants = {
 const BonusBackground: React.FC<BonusBackgroundProps> = ({
   isVisible,
   onAnimationComplete,
+  className,
 }) => (
   <motion.img
     src={bonusBgSrc}
@@ -27,7 +29,8 @@ const BonusBackground: React.FC<BonusBackgroundProps> = ({
     initial="hidden"
     animate={isVisible ? "visible" : "hidden"}
     variants={backgroundVariants}
-    style={{ width: "80%", maxWidth: 400 }}
+    // style={{ width: "80%", maxWidth: 400 }}
+    className={`w-285 object-cover ${className}`}
     onAnimationComplete={isVisible ? onAnimationComplete : undefined}
   />
 );
