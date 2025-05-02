@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   motion,
   useAnimationControls,
-  AnimatePresence,
   Variants,
   AnimationControls,
 } from "framer-motion";
@@ -177,16 +176,22 @@ const AnimationDemo: React.FC = () => {
     resetSequence,
     isPlaying,
     isComplete,
-    shouldShowComponent,
+    shouldShowComponent, // 雖然不用於條件渲染，仍保留以供日誌記錄和偵錯
   } = useAnimationSequence<ComponentType>(animationStages, controlsMap);
 
   // 處理觸發按鈕點擊
   const handleTrigger = useCallback((): void => {
-    resetSequence();
+    console.log({
+      ...apertureControls,
+      mount: apertureControls.mount(),
+    });
+
+    resetSequence(); // 先重置所有動畫狀態
+    // 使用小延遲確保重置完成
     setTimeout(() => {
-      startSequence();
+      startSequence(); // 開始動畫序列
     }, 50);
-  }, [resetSequence, startSequence]);
+  }, [resetSequence, startSequence, apertureControls]);
 
   const appStyle = {
     backgroundImage: `url(${jackpotBg})`,
@@ -218,94 +223,91 @@ const AnimationDemo: React.FC = () => {
 
       {/* 主要動畫容器 */}
       <div className="container absolute top-0 left-0 right-0 bottom-0 outline outline-1 outline-red-600">
-        {/* 光圈效果 - 放在最底層 - 直接使用 motion.img 而不是組件 */}
-        <AnimatePresence>
-          {shouldShowComponent("aperture") && (
-            <motion.div
-              className="top-150 absolute left-0 right-0 bottom-0 w-full h-full"
-              style={{ zIndex: 1 }}
-            >
-              <motion.img
-                src={apertureSrc}
-                alt="光圈效果"
-                className="w-550 h-550 object-cover mx-auto"
-                initial="hidden"
-                animate={apertureControls}
-                variants={apertureVariants}
-                aria-hidden="true"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* 光圈效果 - 方案1: 移除 AnimatePresence 和條件渲染 */}
+        {/* <AnimatePresence> */}
+        {/* {shouldShowComponent("aperture") && ( */}
+        <motion.div
+          className="top-150 absolute left-0 right-0 bottom-0 w-full h-full"
+          style={{ zIndex: 1 }}
+        >
+          <motion.img
+            src={apertureSrc}
+            alt="光圈效果"
+            className="w-550 h-550 object-cover mx-auto"
+            initial="hidden"
+            animate={apertureControls}
+            variants={apertureVariants}
+            aria-hidden="true"
+          />
+        </motion.div>
+        {/* )} */}
+        {/* </AnimatePresence> */}
 
-        {/* 背景容器 */}
-        <AnimatePresence>
-          {shouldShowComponent("background") && (
-            <motion.div
-              className="absolute w-285 h-382 top-250 left-0 right-0 bottom-0 mx-auto"
-              style={{ position: "relative", zIndex: 2 }}
-              initial="hidden"
-              animate={backgroundControls}
-              variants={backgroundVariants}
-            >
-              <BonusBackground className="absolute top-0 left-0 right-0 mx-auto" />
+        {/* 背景容器 - 方案1: 移除 AnimatePresence 和條件渲染 */}
+        {/* <AnimatePresence> */}
+        {/* {shouldShowComponent("background") && ( */}
+        <motion.div
+          className="absolute w-285 h-382 top-250 left-0 right-0 bottom-0 mx-auto"
+          style={{ position: "relative", zIndex: 2 }}
+          initial="hidden"
+          animate={backgroundControls}
+          variants={backgroundVariants}
+        >
+          <BonusBackground className="absolute top-0 left-0 right-0 mx-auto" />
 
-              {/* Lottie 動畫僅在達到特定階段後顯示 */}
-              <AnimatePresence>
-                {shouldShowComponent("lottie") && (
-                  <motion.div
-                    initial="hidden"
-                    animate={lottieControls}
-                    variants={lottieVariants}
-                    className="absolute inset-0 flex items-center justify-center"
-                  >
-                    <LottieOverlay
-                      isVisible={true}
-                      onAnimationComplete={undefined}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          {/* Lottie 動畫 - 方案1: 移除 AnimatePresence 和條件渲染 */}
+          {/* <AnimatePresence> */}
+          {/* {shouldShowComponent("lottie") && ( */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            initial="hidden"
+            animate={lottieControls}
+            variants={lottieVariants}
+          >
+            <LottieOverlay isVisible={true} onAnimationComplete={undefined} />
+          </motion.div>
+          {/* )} */}
+          {/* </AnimatePresence> */}
 
-              {/* 骰子在金色骰盅內位置 */}
-              <AnimatePresence>
-                {shouldShowComponent("dice") && (
-                  <motion.div
-                    className="DiceGroup absolute top-122 left-0 right-0 mx-auto"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                    initial="hidden"
-                    animate={diceControls}
-                    variants={diceVariants}
-                  >
-                    <DiceGroup />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          {/* 骰子 - 方案1: 移除 AnimatePresence 和條件渲染 */}
+          {/* <AnimatePresence> */}
+          {/* {shouldShowComponent("dice") && ( */}
+          <motion.div
+            className="DiceGroup absolute top-122 left-0 right-0 mx-auto"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+            initial="hidden"
+            animate={diceControls}
+            variants={diceVariants}
+          >
+            <DiceGroup />
+          </motion.div>
+          {/* )} */}
+          {/* </AnimatePresence> */}
 
-              {/* 金幣數字在紫色背景區塊 */}
-              <AnimatePresence>
-                {shouldShowComponent("amount") && (
-                  <motion.div
-                    className="absolute top-245 left-0 right-0 mx-auto"
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                    initial="hidden"
-                    animate={amountControls}
-                    variants={amountVariants}
-                  >
-                    <AmountDisplay />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* 金額 - 方案1: 移除 AnimatePresence 和條件渲染 */}
+          {/* <AnimatePresence> */}
+          {/* {shouldShowComponent("amount") && ( */}
+          <motion.div
+            className="absolute top-245 left-0 right-0 mx-auto"
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+            initial="hidden"
+            animate={amountControls}
+            variants={amountVariants}
+          >
+            <AmountDisplay />
+          </motion.div>
+          {/* )} */}
+          {/* </AnimatePresence> */}
+        </motion.div>
+        {/* )} */}
+        {/* </AnimatePresence> */}
       </div>
 
       {/* 動畫完成後顯示重設按鈕 */}
