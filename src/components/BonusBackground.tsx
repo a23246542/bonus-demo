@@ -1,38 +1,24 @@
 import React from "react";
-import { motion, Variants } from "framer-motion";
 import bonusBgSrc from "../assets/bonus-bg.png";
 
 interface BonusBackgroundProps {
-  isVisible: boolean;
-  onAnimationComplete?: () => void;
   className?: string;
 }
 
-const backgroundVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" }, // 縮短動畫時間
-  },
-};
-
-/** 主背景縮放淡入 */
+/**
+ * 主背景圖片內容組件
+ * 移除動畫邏輯，改為單純的圖片渲染
+ */
 const BonusBackground: React.FC<BonusBackgroundProps> = ({
-  isVisible,
-  onAnimationComplete,
-  className,
-}) => (
-  <motion.img
-    src={bonusBgSrc}
-    alt="主背景"
-    initial="hidden"
-    animate={isVisible ? "visible" : "hidden"}
-    variants={backgroundVariants}
-    // style={{ width: "80%", maxWidth: 400 }}
-    className={`w-285 object-cover ${className}`}
-    onAnimationComplete={isVisible ? onAnimationComplete : undefined}
-  />
-);
+  className = "",
+}) => {
+  return (
+    <img
+      src={bonusBgSrc}
+      alt="主背景"
+      className={`w-285 object-cover ${className}`}
+    />
+  );
+};
 
 export default BonusBackground;

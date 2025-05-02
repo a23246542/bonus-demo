@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { motion, Variants } from "framer-motion";
 
 interface LottieOverlayProps {
   isVisible: boolean;
@@ -9,6 +10,16 @@ interface LottieOverlayProps {
 
 const LOTTIE_URL =
   "https://lottie.host/03c77dbb-2ad6-4143-8ce6-4f2db003e207/JubKD5Ylvk.lottie";
+
+// Lottie 元件的動畫 variants
+export const lottieVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 1.0, ease: "easeOut" },
+  },
+};
 
 /** Lottie 疊加動畫，僅播放一次並處理載入錯誤 */
 const LottieOverlay: React.FC<LottieOverlayProps> = ({
@@ -32,7 +43,24 @@ const LottieOverlay: React.FC<LottieOverlayProps> = ({
 
   if (!isVisible) return null;
   if (hasError) {
-    return <div style={{ color: "red" }}>動畫載入失敗</div>;
+    // 提供視覺反饋但不影響整體動畫流程
+    return (
+      <div
+        style={{
+          color: "red",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: "12px",
+          background: "rgba(0,0,0,0.7)",
+          padding: "4px 8px",
+          borderRadius: "4px",
+        }}
+      >
+        動畫載入失敗
+      </div>
+    );
   }
 
   return (
