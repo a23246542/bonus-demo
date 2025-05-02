@@ -185,16 +185,18 @@ const AnimationDemo: React.FC = () => {
   const { startSequence, resetSequence, currentIndex, isPlaying, isComplete } =
     useAnimationSequence([
       {
-        id: "背景和光圈階段",
-        timeout: 1000, // 增加逾時時間到 1000ms
+        id: "背景和光圈階段跟骰子階段",
+        timeout: 2000, // 增加逾時時間到 1000ms
         start: async () => {
           // *** 簡化：直接 await ***
           try {
             await Promise.all([
               apertureControls.start("visible"),
               backgroundControls.start("visible"),
+              diceControls.start("visible"),
             ]);
             console.log("背景和光圈動畫已啟動 (Promise resolved)");
+            console.log("骰子動畫已啟動 (Promise resolved)");
           } catch (err) {
             console.error("背景和光圈動畫啟動失敗:", err);
             // 錯誤會被 useAnimationSequence 捕捉
@@ -202,16 +204,31 @@ const AnimationDemo: React.FC = () => {
           }
         },
       },
+      // {
+      //   id: "骰子階段",
+      //   timeout: 1200, // 增加逾時時間
+      //   start: async () => {
+      //     // *** 簡化：直接 await ***
+      //     try {
+      //       await diceControls.start("visible");
+      //       console.log("骰子動畫已啟動 (Promise resolved)");
+      //     } catch (err) {
+      //       console.error("骰子動畫啟動失敗:", err);
+      //       throw err;
+      //     }
+      //   },
+      // },
+
       {
-        id: "骰子階段",
-        timeout: 1200, // 增加逾時時間
+        id: "金額階段",
+        timeout: 1300, // 增加逾時時間
         start: async () => {
           // *** 簡化：直接 await ***
           try {
-            await diceControls.start("visible");
-            console.log("骰子動畫已啟動 (Promise resolved)");
+            await amountControls.start("visible");
+            console.log("金額動畫已啟動 (Promise resolved)");
           } catch (err) {
-            console.error("骰子動畫啟動失敗:", err);
+            console.error("金額動畫啟動失敗:", err);
             throw err;
           }
         },
@@ -227,20 +244,6 @@ const AnimationDemo: React.FC = () => {
             // 注意：Lottie 元件本身的播放可能需要額外處理或時間
           } catch (err) {
             console.error("Lottie動畫啟動失敗:", err);
-            throw err;
-          }
-        },
-      },
-      {
-        id: "金額階段",
-        timeout: 1300, // 增加逾時時間
-        start: async () => {
-          // *** 簡化：直接 await ***
-          try {
-            await amountControls.start("visible");
-            console.log("金額動畫已啟動 (Promise resolved)");
-          } catch (err) {
-            console.error("金額動畫啟動失敗:", err);
             throw err;
           }
         },
