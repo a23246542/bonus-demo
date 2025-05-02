@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import {
   motion,
   useAnimationControls,
@@ -6,7 +6,7 @@ import {
   AnimationControls,
 } from "framer-motion";
 import BonusBackground from "./BonusBackground";
-import LottieOverlay from "./LottieOverlay";
+import LottieOverlay, { LottieControlsRef } from "./LottieOverlay";
 import DiceGroup from "./DiceGroup";
 import AmountDisplay from "./AmountDisplay";
 import jackpotBg from "../assets/JACKPOT.jpg";
@@ -91,6 +91,9 @@ const AnimationDemo: React.FC = () => {
   const lottieControls = useAnimationControls();
   const amountControls = useAnimationControls();
 
+  // 內部管理 Lottie ref
+  const lottieRef = useRef<LottieControlsRef>(null);
+
   // 建立控制器映射
   const controlsMap = useMemo<Record<ComponentType, AnimationControls>>(
     () => ({
@@ -162,6 +165,11 @@ const AnimationDemo: React.FC = () => {
         try {
           await controls.lottie.start("visible");
           console.log("Lottie動畫已啟動");
+
+          // 在這裡手動播放 Lottie 動畫
+          if (lottieRef.current) {
+            lottieRef.current.play();
+          }
         } catch (err) {
           console.error("Lottie動畫啟動失敗:", err);
           throw err;
@@ -192,6 +200,31 @@ const AnimationDemo: React.FC = () => {
       startSequence(); // 開始動畫序列
     }, 50);
   }, [resetSequence, startSequence, apertureControls]);
+
+  // 手動控制 Lottie 動畫的函式
+  const playLottie = useCallback(() => {
+    if (lottieRef.current) {
+      lottieRef.current.play();
+    }
+  }, []);
+
+  const pauseLottie = useCallback(() => {
+    if (lottieRef.current) {
+      lottieRef.current.pause();
+    }
+  }, []);
+
+  const stopLottie = useCallback(() => {
+    if (lottieRef.current) {
+      lottieRef.current.stop();
+    }
+  }, []);
+
+  const seekLottie = useCallback((frame: number) => {
+    if (lottieRef.current) {
+      lottieRef.current.seek(frame);
+    }
+  }, []);
 
   const appStyle = {
     backgroundImage: `url(${jackpotBg})`,
@@ -264,7 +297,11 @@ const AnimationDemo: React.FC = () => {
             animate={lottieControls}
             variants={lottieVariants}
           >
-            <LottieOverlay isVisible={true} onAnimationComplete={undefined} />
+            <LottieOverlay
+              ref={lottieRef}
+              isVisible={true}
+              onAnimationComplete={() => console.log("Lottie 動畫播放完成")}
+            />
           </motion.div>
           {/* )} */}
           {/* </AnimatePresence> */}
@@ -308,6 +345,34 @@ const AnimationDemo: React.FC = () => {
         </motion.div>
         {/* )} */}
         {/* </AnimatePresence> */}
+      </div>
+
+      {/* Lottie 控制按鈕 */}
+      <div className="absolute bottom-40 left-0 right-0 mx-auto flex justify-center gap-2">
+        <button
+          onClick={playLottie}
+          className="text-xs px-2 py-1 bg-blue-500 text-white rounded"
+        >
+          播放
+        </button>
+        <button
+          onClick={pauseLottie}
+          className="text-xs px-2 py-1 bg-yellow-500 text-white rounded"
+        >
+          暫停
+        </button>
+        <button
+          onClick={stopLottie}
+          className="text-xs px-2 py-1 bg-red-500 text-white rounded"
+        >
+          停止
+        </button>
+        <button
+          onClick={() => seekLottie(30)}
+          className="text-xs px-2 py-1 bg-green-500 text-white rounded"
+        >
+          跳至30幀
+        </button>
       </div>
 
       {/* 動畫完成後顯示重設按鈕 */}
