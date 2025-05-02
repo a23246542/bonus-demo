@@ -1,9 +1,16 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import {
   motion,
   useAnimationControls,
   Variants,
   AnimationControls,
+  AnimatePresence,
 } from "framer-motion";
 import BonusBackground from "./BonusBackground";
 import LottieOverlay, { LottieControlsRef } from "./LottieOverlay";
@@ -79,6 +86,22 @@ const amountVariants: Variants = {
   },
 };
 
+// 主要容器動畫變體
+const containerVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.8,
+    y: 20,
+    transition: { duration: 0.8, ease: "easeInOut" },
+  },
+};
+
 /**
  * AnimationDemo: 整合多層動畫的主要元件
  * 統一在外層處理動畫邏輯，內部組件專注於內容渲染
@@ -90,6 +113,9 @@ const AnimationDemo: React.FC = () => {
   const diceControls = useAnimationControls();
   const lottieControls = useAnimationControls();
   const amountControls = useAnimationControls();
+
+  // 控制整個容器的顯示狀態
+  const [showContainer, setShowContainer] = useState(false);
 
   // 內部管理 Lottie ref
   const lottieRef = useRef<LottieControlsRef>(null);
@@ -187,6 +213,18 @@ const AnimationDemo: React.FC = () => {
     shouldShowComponent, // 雖然不用於條件渲染，仍保留以供日誌記錄和偵錯
   } = useAnimationSequence<ComponentType>(animationStages, controlsMap);
 
+  // 當動畫完成後，設定計時器在 3 秒後隱藏容器
+  useEffect(() => {
+    if (isComplete) {
+      const timer = setTimeout(() => {
+        setShowContainer(false);
+        console.log("動畫容器淡出中...");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isComplete]);
+
   // 處理觸發按鈕點擊
   const handleTrigger = useCallback((): void => {
     console.log({
@@ -195,6 +233,8 @@ const AnimationDemo: React.FC = () => {
     });
 
     resetSequence(); // 先重置所有動畫狀態
+    setShowContainer(true); // 顯示容器
+
     // 使用小延遲確保重置完成
     setTimeout(() => {
       startSequence(); // 開始動畫序列
@@ -254,98 +294,88 @@ const AnimationDemo: React.FC = () => {
         開始動畫
       </button>
 
-      {/* 主要動畫容器 */}
-      <div className="container absolute top-0 left-0 right-0 bottom-0 outline outline-1 outline-red-600">
-        {/* 光圈效果 - 方案1: 移除 AnimatePresence 和條件渲染 */}
-        {/* <AnimatePresence> */}
-        {/* {shouldShowComponent("aperture") && ( */}
-        <motion.div
-          className="top-150 absolute left-0 right-0 bottom-0 w-full h-full"
-          style={{ zIndex: 1 }}
-        >
-          <motion.img
-            src={apertureSrc}
-            alt="光圈效果"
-            className="w-550 h-550 object-cover mx-auto"
-            initial="hidden"
-            animate={apertureControls}
-            variants={apertureVariants}
-            aria-hidden="true"
-          />
-        </motion.div>
-        {/* )} */}
-        {/* </AnimatePresence> */}
-
-        {/* 背景容器 - 方案1: 移除 AnimatePresence 和條件渲染 */}
-        {/* <AnimatePresence> */}
-        {/* {shouldShowComponent("background") && ( */}
-        <motion.div
-          className="absolute w-285 h-382 top-250 left-0 right-0 bottom-0 mx-auto"
-          style={{ position: "relative", zIndex: 2 }}
-          initial="hidden"
-          animate={backgroundControls}
-          variants={backgroundVariants}
-        >
-          <BonusBackground className="absolute top-0 left-0 right-0 mx-auto" />
-
-          {/* Lottie 動畫 - 方案1: 移除 AnimatePresence 和條件渲染 */}
-          {/* <AnimatePresence> */}
-          {/* {shouldShowComponent("lottie") && ( */}
+      {/* 使用 AnimatePresence 包裹主要動畫容器，處理出場動畫 */}
+      <AnimatePresence>
+        {showContainer && (
           <motion.div
-            className="absolute inset-0 flex items-center justify-center"
+            className="container absolute top-0 left-0 right-0 bottom-0 outline outline-1 outline-red-600"
+            variants={containerVariants}
             initial="hidden"
-            animate={lottieControls}
-            variants={lottieVariants}
+            animate="visible"
+            exit="exit"
           >
-            <LottieOverlay
-              ref={lottieRef}
-              isVisible={true}
-              onAnimationComplete={() => console.log("Lottie 動畫播放完成")}
-            />
-          </motion.div>
-          {/* )} */}
-          {/* </AnimatePresence> */}
+            {/* 光圈效果 */}
+            <motion.div
+              className="top-150 absolute left-0 right-0 bottom-0 w-full h-full"
+              style={{ zIndex: 1 }}
+            >
+              <motion.img
+                src={apertureSrc}
+                alt="光圈效果"
+                className="w-550 h-550 object-cover mx-auto"
+                initial="hidden"
+                animate={apertureControls}
+                variants={apertureVariants}
+                aria-hidden="true"
+              />
+            </motion.div>
 
-          {/* 骰子 - 方案1: 移除 AnimatePresence 和條件渲染 */}
-          {/* <AnimatePresence> */}
-          {/* {shouldShowComponent("dice") && ( */}
-          <motion.div
-            className="DiceGroup absolute top-122 left-0 right-0 mx-auto"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-            initial="hidden"
-            animate={diceControls}
-            variants={diceVariants}
-          >
-            <DiceGroup />
-          </motion.div>
-          {/* )} */}
-          {/* </AnimatePresence> */}
+            {/* 背景容器 */}
+            <motion.div
+              className="absolute w-285 h-382 top-250 left-0 right-0 bottom-0 mx-auto"
+              style={{ position: "relative", zIndex: 2 }}
+              initial="hidden"
+              animate={backgroundControls}
+              variants={backgroundVariants}
+            >
+              <BonusBackground className="absolute top-0 left-0 right-0 mx-auto" />
 
-          {/* 金額 - 方案1: 移除 AnimatePresence 和條件渲染 */}
-          {/* <AnimatePresence> */}
-          {/* {shouldShowComponent("amount") && ( */}
-          <motion.div
-            className="absolute top-245 left-0 right-0 mx-auto"
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-            }}
-            initial="hidden"
-            animate={amountControls}
-            variants={amountVariants}
-          >
-            <AmountDisplay />
+              {/* Lottie 動畫 */}
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                initial="hidden"
+                animate={lottieControls}
+                variants={lottieVariants}
+              >
+                <LottieOverlay
+                  ref={lottieRef}
+                  isVisible={true}
+                  onAnimationComplete={() => console.log("Lottie 動畫播放完成")}
+                />
+              </motion.div>
+
+              {/* 骰子 */}
+              <motion.div
+                className="DiceGroup absolute top-122 left-0 right-0 mx-auto"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+                initial="hidden"
+                animate={diceControls}
+                variants={diceVariants}
+              >
+                <DiceGroup />
+              </motion.div>
+
+              {/* 金額 */}
+              <motion.div
+                className="absolute top-245 left-0 right-0 mx-auto"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+                initial="hidden"
+                animate={amountControls}
+                variants={amountVariants}
+              >
+                <AmountDisplay />
+              </motion.div>
+            </motion.div>
           </motion.div>
-          {/* )} */}
-          {/* </AnimatePresence> */}
-        </motion.div>
-        {/* )} */}
-        {/* </AnimatePresence> */}
-      </div>
+        )}
+      </AnimatePresence>
 
       {/* Lottie 控制按鈕 */}
       <div className="absolute bottom-40 left-0 right-0 mx-auto flex justify-center gap-2">
@@ -376,7 +406,7 @@ const AnimationDemo: React.FC = () => {
       </div>
 
       {/* 動畫完成後顯示重設按鈕 */}
-      {isComplete && (
+      {isComplete && showContainer && (
         <button
           onClick={resetSequence}
           className="absolute bottom-20 left-0 right-0 mx-auto"
