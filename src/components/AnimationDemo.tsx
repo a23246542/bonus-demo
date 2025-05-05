@@ -20,6 +20,7 @@ import jackpotBg from "../assets/JACKPOT.jpg";
 import apertureSrc from "../assets/aperture.png"; // 直接引入光圈圖片
 import { useAnimationSequence } from "../hooks/useAnimationSequence";
 import ProjectileAnimation from "./ProjectileAnimation"; // 從新檔案匯入
+import CountUp from "./CountUp";
 
 // 動畫元件類型定義
 type ComponentType =
@@ -129,6 +130,9 @@ const AnimationDemo: React.FC = () => {
   // 控制整個容器的顯示狀態
   const [showContainer, setShowContainer] = useState(false);
 
+  // 控制 CountUp 動畫的啟動狀態
+  const [startCountUp, setStartCountUp] = useState(false);
+
   // 內部管理 Lottie ref
   const lottieRef = useRef<LottieControlsRef>(null);
 
@@ -192,6 +196,12 @@ const AnimationDemo: React.FC = () => {
         try {
           await controls.amount.start("visible");
           console.log("金額動畫已啟動");
+
+          // 金額 div 出現後，延遲一小段時間再啟動 CountUp 動畫
+          setTimeout(() => {
+            setStartCountUp(true);
+            console.log("CountUp 動畫開始啟動");
+          }, 300);
         } catch (err) {
           console.error("金額動畫啟動失敗:", err);
           throw err;
@@ -268,6 +278,7 @@ const AnimationDemo: React.FC = () => {
 
     resetSequence(); // 先重置所有動畫狀態
     setShowContainer(true); // 顯示容器
+    setStartCountUp(false); // 重置 CountUp 狀態
 
     // 使用小延遲確保重置完成
     setTimeout(() => {
@@ -482,7 +493,14 @@ const AnimationDemo: React.FC = () => {
                 animate={amountControls}
                 variants={amountVariants}
               >
-                <AmountDisplay />
+                <CountUp
+                  to={999999}
+                  duration={2}
+                  separator=","
+                  startWhen={startCountUp}
+                  onStart={() => console.log("CountUp 動畫開始執行")}
+                  onEnd={() => console.log("CountUp 動畫執行完畢")}
+                />
               </motion.div>
             </motion.div>
           </motion.div>
