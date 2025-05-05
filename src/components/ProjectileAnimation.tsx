@@ -17,6 +17,39 @@ interface Position {
   y: number;
 }
 
+/**
+ * 計算拋物線軌跡上的位置
+ * @param p 時間進度 (0-1)
+ * @param v0 初速度
+ * @param angle 角度 (度)
+ * @param startX 起始X座標
+ * @param startY 起始Y座標
+ * @param duration 動畫持續時間 (秒)
+ * @returns 計算後的位置座標
+ */
+const calculateProjectilePosition = (
+  p: number,
+  v0: number,
+  angle: number,
+  startX: number,
+  startY: number,
+  duration: number = 2
+): Position => {
+  // 將進度轉換為實際時間 (秒)
+  const t = p * duration;
+
+  // 使用標準拋物線公式計算位移
+  const rad = (angle * Math.PI) / 180;
+  const vx = v0 * Math.cos(rad);
+  const vy = v0 * Math.sin(rad);
+
+  // 計算相對位移並轉換為螢幕座標
+  const x = startX + vx * t * scale;
+  const y = startY - (vy * t - 0.5 * g * t * t) * scale; // 注意螢幕座標系y軸向下
+
+  return { x, y };
+};
+
 interface ProjectileAnimationProps {
   id?: string;
   v0?: number; // 初速度
@@ -27,6 +60,7 @@ interface ProjectileAnimationProps {
   size?: number; // 粒子大小
   onComplete?: (id: string) => void; // 完成回呼
   controls?: AnimationControls; // 動畫控制器
+  duration?: number; // 動畫持續時間 (秒)
 }
 
 const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
@@ -39,6 +73,7 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
   size = 16,
   onComplete,
   controls,
+  duration = 1, // 預設動畫持續時間
 }) => {
   // 使用 useMotionValue 來追蹤時間進度
   const progress = useMotionValue(0);
@@ -54,7 +89,7 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
   useEffect(() => {
     if (isVisible && !isCompleted) {
       animate(progress, 1, {
-        duration: 2,
+        duration: duration, // 使用可設定的持續時間
         ease: "linear",
         onComplete: () => {
           setIsCompleted(true);
@@ -62,18 +97,17 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
         },
       });
     }
-  }, [isVisible, progress, id, onComplete, isCompleted]);
+  }, [isVisible, progress, id, onComplete, isCompleted, duration]);
 
   // 使用 useTransform 建立衍生值
   const x = useTransform(progress, (p) => {
-    const vx = v0 * Math.cos((angle * Math.PI) / 180);
-    return startX + vx * p * scale;
+    return calculateProjectilePosition(p, v0, angle, startX, startY, duration)
+      .x;
   });
 
   const y = useTransform(progress, (p) => {
-    const vy = v0 * Math.sin((angle * Math.PI) / 180);
-    const calculatedY = vy * p - 0.5 * g * p * p;
-    return startY - calculatedY * scale;
+    return calculateProjectilePosition(p, v0, angle, startX, startY, duration)
+      .y;
   });
 
   // 漸變透明度
