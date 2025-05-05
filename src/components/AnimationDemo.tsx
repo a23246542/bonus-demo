@@ -198,24 +198,24 @@ const AnimationDemo: React.FC = () => {
         }
       },
     },
-    {
-      id: "Lottie階段",
-      timeout: 1500,
-      execute: async (controls: Record<ComponentType, AnimationControls>) => {
-        try {
-          await controls.lottie.start("visible");
-          console.log("Lottie動畫已啟動");
+    // {
+    //   id: "Lottie階段",
+    //   timeout: 1500,
+    //   execute: async (controls: Record<ComponentType, AnimationControls>) => {
+    //     try {
+    //       await controls.lottie.start("visible");
+    //       console.log("Lottie動畫已啟動");
 
-          // 在這裡手動播放 Lottie 動畫
-          if (lottieRef.current) {
-            lottieRef.current.play();
-          }
-        } catch (err) {
-          console.error("Lottie動畫啟動失敗:", err);
-          throw err;
-        }
-      },
-    },
+    //       // 在這裡手動播放 Lottie 動畫
+    //       if (lottieRef.current) {
+    //         lottieRef.current.play();
+    //       }
+    //     } catch (err) {
+    //       console.error("Lottie動畫啟動失敗:", err);
+    //       throw err;
+    //     }
+    //   },
+    // },
     {
       id: "拋物線粒子階段",
       timeout: 2000,

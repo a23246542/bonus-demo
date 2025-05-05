@@ -6,6 +6,7 @@ import {
   animate,
   AnimationControls,
 } from "framer-motion";
+import Coin from "./Coin";
 
 // 重力（m/s²）、比例尺（1 m = 10 px）
 const g = 9.8;
@@ -96,15 +97,17 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
         y,
         width: size,
         height: size,
-        borderRadius: "50%",
-        background: `radial-gradient(circle, ${color}, ${
-          color === "gold" ? "darkgoldenrod" : color
-        })`,
+        // borderRadius: "50%",
+        // background: `radial-gradient(circle, ${color}, ${
+        //   color === "gold" ? "darkgoldenrod" : color
+        // })`,
         position: "absolute",
         opacity,
-        boxShadow: `0 0 10px ${color}`,
+        // boxShadow: `0 0 10px ${color}`,
       }}
-    />
+    >
+      <Coin />
+    </motion.div>
   );
 };
 
