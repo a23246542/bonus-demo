@@ -19,9 +19,16 @@ import AmountDisplay from "./AmountDisplay";
 import jackpotBg from "../assets/JACKPOT.jpg";
 import apertureSrc from "../assets/aperture.png"; // 直接引入光圈圖片
 import { useAnimationSequence } from "../hooks/useAnimationSequence";
+import ProjectileAnimation from "./ProjectileAnimation"; // 從新檔案匯入
 
 // 動畫元件類型定義
-type ComponentType = "aperture" | "background" | "dice" | "lottie" | "amount";
+type ComponentType =
+  | "aperture"
+  | "background"
+  | "dice"
+  | "lottie"
+  | "amount"
+  | "projectile";
 
 /**
  * 定義各種動畫變體
@@ -86,6 +93,10 @@ const amountVariants: Variants = {
   },
 };
 
+const projectileVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
 // 主要容器動畫變體
 const containerVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
@@ -113,6 +124,7 @@ const AnimationDemo: React.FC = () => {
   const diceControls = useAnimationControls();
   const lottieControls = useAnimationControls();
   const amountControls = useAnimationControls();
+  const projectileControls = useAnimationControls(); // 新增拋物線動畫控制器
 
   // 控制整個容器的顯示狀態
   const [showContainer, setShowContainer] = useState(false);
@@ -128,6 +140,7 @@ const AnimationDemo: React.FC = () => {
       dice: diceControls,
       lottie: lottieControls,
       amount: amountControls,
+      projectile: projectileControls,
     }),
     [
       apertureControls,
@@ -135,6 +148,7 @@ const AnimationDemo: React.FC = () => {
       diceControls,
       lottieControls,
       amountControls,
+      projectileControls,
     ]
   );
 
@@ -202,6 +216,26 @@ const AnimationDemo: React.FC = () => {
         }
       },
     },
+    {
+      id: "拋物線粒子階段",
+      timeout: 2000,
+      execute: async (controls: Record<ComponentType, AnimationControls>) => {
+        try {
+          // await controls.projectile.start("visible");
+          await controls.projectile.start({
+            opacity: 1,
+            // transition: { duration: 3 },
+          });
+          console.log("拋物線粒子動畫已啟動");
+
+          // 等待拋物線動畫完成
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        } catch (err) {
+          console.error("拋物線粒子動畫啟動失敗:", err);
+          throw err;
+        }
+      },
+    },
   ];
 
   // 使用自定義動畫序列控制器
@@ -217,7 +251,7 @@ const AnimationDemo: React.FC = () => {
   useEffect(() => {
     if (isComplete) {
       const timer = setTimeout(() => {
-        setShowContainer(false);
+        // setShowContainer(false);
         console.log("動畫容器淡出中...");
       }, 3000);
 
@@ -229,7 +263,7 @@ const AnimationDemo: React.FC = () => {
   const handleTrigger = useCallback((): void => {
     console.log({
       ...apertureControls,
-      mount: apertureControls.mount(),
+      // mount: apertureControls.mount(),
     });
 
     resetSequence(); // 先重置所有動畫狀態
@@ -341,6 +375,51 @@ const AnimationDemo: React.FC = () => {
                   ref={lottieRef}
                   isVisible={true}
                   onAnimationComplete={() => console.log("Lottie 動畫播放完成")}
+                />
+              </motion.div>
+
+              {/* 拋物線粒子 */}
+              <motion.div
+                className="absolute inset-0"
+                // initial="hidden"
+                // animate={projectileControls}
+                // variants={{
+                //   hidden: { opacity: 1 },
+                //   visible: { opacity: 1 },
+                // }}
+              >
+                <ProjectileAnimation
+                  id="projectile-1"
+                  v0={20}
+                  angle={45}
+                  color="gold"
+                  startX={120}
+                  startY={220}
+                  size={16}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
+                />
+                <ProjectileAnimation
+                  id="projectile-2"
+                  v0={18}
+                  angle={60}
+                  color="#ff9933"
+                  startX={140}
+                  startY={220}
+                  size={14}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
+                />
+                <ProjectileAnimation
+                  id="projectile-3"
+                  v0={22}
+                  angle={30}
+                  color="#ffcc33"
+                  startX={160}
+                  startY={220}
+                  size={12}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
                 />
               </motion.div>
 
