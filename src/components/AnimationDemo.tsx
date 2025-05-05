@@ -390,7 +390,7 @@ const AnimationDemo: React.FC = () => {
               >
                 <ProjectileAnimation
                   id="projectile-1"
-                  v0={20}
+                  v0={10}
                   angle={45}
                   color="gold"
                   startX={120}
@@ -401,7 +401,7 @@ const AnimationDemo: React.FC = () => {
                 />
                 <ProjectileAnimation
                   id="projectile-2"
-                  v0={18}
+                  v0={8}
                   angle={60}
                   color="#ff9933"
                   startX={140}
@@ -412,8 +412,41 @@ const AnimationDemo: React.FC = () => {
                 />
                 <ProjectileAnimation
                   id="projectile-3"
-                  v0={22}
+                  v0={12}
                   angle={30}
+                  color="#ffcc33"
+                  startX={160}
+                  startY={220}
+                  size={12}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
+                />
+                <ProjectileAnimation
+                  id="projectile-4"
+                  v0={10}
+                  angle={120}
+                  color="gold"
+                  startX={120}
+                  startY={220}
+                  size={16}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
+                />
+                <ProjectileAnimation
+                  id="projectile-5"
+                  v0={8}
+                  angle={140}
+                  color="#ff9933"
+                  startX={140}
+                  startY={220}
+                  size={14}
+                  controls={projectileControls}
+                  onComplete={(id) => console.log(`粒子 ${id} 完成動畫`)}
+                />
+                <ProjectileAnimation
+                  id="projectile-6"
+                  v0={12}
+                  angle={160}
                   color="#ffcc33"
                   startX={160}
                   startY={220}

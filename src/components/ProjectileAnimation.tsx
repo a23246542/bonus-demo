@@ -8,10 +8,6 @@ import {
 } from "framer-motion";
 import Coin from "./Coin";
 
-// 重力（m/s²）、比例尺（1 m = 10 px）
-const g = 9.8;
-const scale = 10;
-
 interface Position {
   x: number;
   y: number;
@@ -25,6 +21,8 @@ interface Position {
  * @param startX 起始X座標
  * @param startY 起始Y座標
  * @param duration 動畫持續時間 (秒)
+ * @param g 重力加速度 (m/s²)
+ * @param scale 比例尺 (1 m = scale px)
  * @returns 計算後的位置座標
  */
 const calculateProjectilePosition = (
@@ -33,7 +31,9 @@ const calculateProjectilePosition = (
   angle: number,
   startX: number,
   startY: number,
-  duration: number = 2
+  duration: number = 2,
+  g: number = 9.8,
+  scale: number = 25
 ): Position => {
   // 將進度轉換為實際時間 (秒)
   const t = p * duration;
@@ -111,7 +111,7 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
   });
 
   // 漸變透明度
-  const opacity = useTransform(progress, [0, 0.01, 0.7, 1], [0, 1, 0.8, 0]);
+  const opacity = useTransform(progress, [0, 0.01, 0.9, 1], [0, 1, 0.8, 0]);
 
   return (
     <motion.div
