@@ -83,7 +83,7 @@ const ProjectileAnimation: React.FC<ProjectileAnimationProps> = ({
   // 追蹤動畫是否已完成
   const [isCompleted, setIsCompleted] = useState(false);
 
-  console.log(`isVisible: ${isVisible}, isCompleted: ${isCompleted}`);
+  // console.log(`isVisible: ${isVisible}, isCompleted: ${isCompleted}`);
 
   // 當元件顯示時開始動畫
   useEffect(() => {

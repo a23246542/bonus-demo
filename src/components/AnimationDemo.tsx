@@ -11,6 +11,7 @@ import {
   Variants,
   AnimationControls,
   AnimatePresence,
+  m,
 } from "framer-motion";
 import BonusBackground from "./BonusBackground";
 import LottieOverlay, { LottieControlsRef } from "./LottieOverlay";
@@ -18,6 +19,8 @@ import DiceGroup from "./DiceGroup";
 import AmountDisplay from "./AmountDisplay";
 import jackpotBg from "../assets/JACKPOT.jpg";
 import apertureSrc from "../assets/aperture.png"; // 直接引入光圈圖片
+import starCoin from "../assets/star-coin.png"; // 直接引入星星硬幣圖片
+import double from "../assets/x2.png"; // 直接引入雙倍圖片
 import { useAnimationSequence } from "../hooks/useAnimationSequence";
 import ProjectileAnimation from "./ProjectileAnimation"; // 從新檔案匯入
 import CountUp from "./CountUp";
@@ -29,8 +32,8 @@ type ComponentType =
   | "dice"
   | "lottie"
   | "amount"
-  | "projectile";
-
+  | "projectile"
+  | "double";
 /**
  * 定義各種動畫變體
  */
@@ -93,12 +96,36 @@ const amountVariants: Variants = {
     // y: 0,
     // transition: { duration: 0.1, ease: "easeOut" },
   },
+  moveLeft: {
+    x: -20,
+    transition: {
+      duration: 0.3,
+      // ease: "easeOut",
+      // delay: 0.5,
+    },
+  },
 };
 
 const projectileVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
 };
+
+const doubleVariants: Variants = {
+  hidden: { opacity: 0, y: 0 },
+  visible: {
+    opacity: 1,
+    y: -2,
+    scale: [1, 1.7, 1],
+    // transition: { duration: 0.7, ease: "easeOut" },
+    transition: {
+      duration: 0.3, // 總持續時間 0.7 秒
+      times: [0, 0.385, 1], // 第一段佔 28.5%（約 0.2 秒），第二段佔剩下 71.5%（約 0.5 秒）
+      ease: "easeInOut",
+    },
+  },
+};
+
 // 主要容器動畫變體
 const containerVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
@@ -127,6 +154,7 @@ const AnimationDemo: React.FC = () => {
   const lottieControls = useAnimationControls();
   const amountControls = useAnimationControls();
   const projectileControls = useAnimationControls(); // 新增拋物線動畫控制器
+  const doubleControls = useAnimationControls();
 
   // 控制整個容器的顯示狀態
   const [showContainer, setShowContainer] = useState(false);
@@ -149,6 +177,7 @@ const AnimationDemo: React.FC = () => {
       lottie: lottieControls,
       amount: amountControls,
       projectile: projectileControls,
+      double: doubleControls,
     }),
     [
       apertureControls,
@@ -157,6 +186,7 @@ const AnimationDemo: React.FC = () => {
       lottieControls,
       amountControls,
       projectileControls,
+      doubleControls,
     ]
   );
 
@@ -216,6 +246,10 @@ const AnimationDemo: React.FC = () => {
             console.log("CountUp 動畫開始啟動");
             // }, 300);
           });
+
+          await controls.amount.start("moveLeft");
+          await controls.double.start("visible");
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           console.log("金額階段完全結束，準備進入下一階段");
         } catch (err) {
@@ -499,7 +533,8 @@ const AnimationDemo: React.FC = () => {
 
               {/* 金額 */}
               <motion.div
-                className="absolute top-245 left-0 right-0 mx-auto"
+                // className="absolute top-240 left-0 right-0 mx-auto"
+                className="absolute top-240 left-[6%] right-0 mx-auto"
                 style={{
                   width: "100%",
                   display: "flex",
@@ -509,24 +544,35 @@ const AnimationDemo: React.FC = () => {
                 animate={amountControls}
                 variants={amountVariants}
               >
-                <CountUp
-                  to={9999}
-                  // to={100}
-                  duration={4}
-                  separator=","
-                  startWhen={startCountUp}
-                  className="text-[#FBF04C] font-roboto text-[30px] font-black leading-[32px] text-right"
-                  onStart={() => console.log("CountUp 動畫開始執行")}
-                  onEnd={() => {
-                    console.log("CountUp 動畫執行完畢");
-                    // 使用 ref 存儲的回調函式
-                    if (countUpCompleteRef.current) {
-                      countUpCompleteRef.current();
-                      // 執行後清除引用
-                      countUpCompleteRef.current = null;
-                    }
-                  }}
-                />
+                <div className="flex items-center">
+                  <img src={starCoin} className="w-26 h-26 mr-5" />
+                  <CountUp
+                    to={9999999}
+                    // to={19999}
+                    duration={4}
+                    separator=","
+                    startWhen={startCountUp}
+                    className="text-[#FBF04C] font-roboto text-[30px] font-black leading-[32px] text-right"
+                    onStart={() => console.log("CountUp 動畫開始執行")}
+                    onEnd={() => {
+                      console.log("CountUp 動畫執行完畢");
+                      // 使用 ref 存儲的回調函式
+                      if (countUpCompleteRef.current) {
+                        countUpCompleteRef.current();
+                        // 執行後清除引用
+                        countUpCompleteRef.current = null;
+                      }
+                    }}
+                  />
+                  <motion.img
+                    src={double}
+                    // className="w-38 h-23 ml-5"
+                    className="w-42 h-28 ml-5"
+                    initial="hidden"
+                    variants={doubleVariants}
+                    animate={doubleControls}
+                  />
+                </div>
               </motion.div>
             </motion.div>
           </motion.div>
