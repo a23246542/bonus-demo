@@ -43,12 +43,13 @@ export default function CountUp({
 
   const isInView = useInView(ref, { once: true, margin: "0px" });
 
-  // 設定初始文字內容
+  // 設定初始文字內容 - 初始值不顯示在中間，直接顯示在終點位置
   useEffect(() => {
     if (ref.current) {
-      ref.current.textContent = String(direction === "down" ? to : from);
+      // 初始時不顯示任何內容，避免閃現0
+      ref.current.textContent = "";
     }
-  }, [from, to, direction]);
+  }, []);
 
   // 用於追蹤動畫持續時間並強制完成
   useEffect(() => {
@@ -57,6 +58,25 @@ export default function CountUp({
 
       if (typeof onStart === "function") {
         onStart();
+      }
+
+      // 開始動畫前先設定起始顯示
+      if (ref.current) {
+        const options = {
+          useGrouping: !!separator,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        };
+
+        // 設定正確的起始值顯示（對齊在右側）
+        const startValue = direction === "down" ? to : from;
+        const formattedNumber = Intl.NumberFormat("en-US", options).format(
+          startValue
+        );
+
+        ref.current.textContent = separator
+          ? formattedNumber.replace(/,/g, separator)
+          : formattedNumber;
       }
 
       // 開始動畫
