@@ -158,6 +158,8 @@ const AnimationDemo: React.FC = () => {
 
   // 控制整個容器的顯示狀態
   const [showContainer, setShowContainer] = useState(false);
+  const [toValue, setToValue] = useState(19999); // 設定金額的初始值
+  // const [toValue, setToValue] = useState(9999999); // 設定金額的初始值
 
   // 控制 CountUp 動畫的啟動狀態
   const [startCountUp, setStartCountUp] = useState(false);
@@ -546,13 +548,16 @@ const AnimationDemo: React.FC = () => {
               >
                 <div className="flex items-center">
                   <img src={starCoin} className="w-26 h-26 mr-5" />
+                  {/* 根據 from/to 數字長度動態調整字體大小 */}
                   <CountUp
-                    to={9999999}
+                    to={toValue}
                     // to={19999}
                     duration={4}
                     separator=","
                     startWhen={startCountUp}
-                    className="text-[#FBF04C] font-roboto text-[30px] font-black leading-[32px] text-right"
+                    className={`text-[#FBF04C] font-roboto ${
+                      String(toValue).length > 6 ? "text-25" : "text-30"
+                    } font-black leading-[32px] text-right`}
                     onStart={() => console.log("CountUp 動畫開始執行")}
                     onEnd={() => {
                       console.log("CountUp 動畫執行完畢");
