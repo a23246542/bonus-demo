@@ -86,11 +86,12 @@ const lottieVariants: Variants = {
 
 // 金額動畫
 const amountVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  // hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: "easeOut" },
+    // y: 0,
+    // transition: { duration: 0.1, ease: "easeOut" },
   },
 };
 
@@ -194,7 +195,7 @@ const AnimationDemo: React.FC = () => {
     // },
     {
       id: "金額階段",
-      timeout: 3000, // 增加逾時時間，確保有足夠時間讓 CountUp 完成
+      timeout: 900000, // 增加逾時時間，確保有足夠時間讓 CountUp 完成
       execute: async (controls: Record<ComponentType, AnimationControls>) => {
         try {
           // 先顯示金額容器
@@ -243,7 +244,7 @@ const AnimationDemo: React.FC = () => {
     // },
     {
       id: "拋物線粒子階段",
-      timeout: 2000,
+      timeout: 3000,
       execute: async (controls: Record<ComponentType, AnimationControls>) => {
         try {
           // await controls.projectile.start("visible");
@@ -509,10 +510,12 @@ const AnimationDemo: React.FC = () => {
                 variants={amountVariants}
               >
                 <CountUp
-                  to={999999}
-                  duration={3}
+                  to={9999}
+                  // to={100}
+                  duration={4}
                   separator=","
                   startWhen={startCountUp}
+                  className="text-[#FBF04C] font-roboto text-[30px] font-black leading-[32px] text-right"
                   onStart={() => console.log("CountUp 動畫開始執行")}
                   onEnd={() => {
                     console.log("CountUp 動畫執行完畢");
