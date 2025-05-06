@@ -89,13 +89,13 @@ export function useAnimationSequence<T extends string>(
 
       for (let i = 0; i < animations.length; i++) {
         const animation = animations[i];
-        console.log(`動畫階段變更: ${animation.id}`);
+        console.log(`動畫階段變更: ${animation.id}`, performance.now());
 
         // 更新索引
         setCurrentIndex(i);
 
         // 加入短暫延遲，等待 DOM 更新
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        // await new Promise((resolve) => setTimeout(resolve, 50));
 
         // 執行動畫
         const executePromise = animation.execute(controlsProxy);
@@ -126,7 +126,7 @@ export function useAnimationSequence<T extends string>(
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // await new Promise((resolve) => setTimeout(resolve, 50));
       setIsComplete(true);
     } catch (error) {
       console.error("動畫序列執行錯誤:", error);

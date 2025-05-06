@@ -128,7 +128,7 @@ export default function CountUp({
   ]);
 
   useMotionValueEvent(springValue, "change", (latest) => {
-    console.log("change", latest); // 可選：用於除錯
+    // console.log("change", latest); // 可選：用於除錯
     if (ref.current) {
       const options = {
         useGrouping: !!separator,

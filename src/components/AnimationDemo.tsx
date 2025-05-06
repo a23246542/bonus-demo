@@ -65,11 +65,14 @@ const backgroundVariants: Variants = {
   //   scale: 1,
   //   transition: { duration: 0.5, ease: "easeOut" },
   // },
-  hidden: { opacity: 0, scale: 0.5 }, // 從較小的尺寸開始，如同 popup 出現
+  hidden: { opacity: 0, scale: 0.3 }, // 從較小的尺寸開始，如同 popup 出現
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { type: "spring", stiffness: 300, damping: 20 }, // 使用彈簧動畫達到popup效果
+    transition: {
+      scale: { type: "spring", stiffness: 150, damping: 15 },
+      // scale: { type: "spring", bounce: 0.2, duration: 100 },
+    }, // 使用彈簧動畫達到popup效果
   },
 };
 
@@ -79,7 +82,7 @@ const diceVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: "easeOut" },
+    transition: { duration: 0.5, ease: "easeOut" },
   },
 };
 
@@ -100,14 +103,15 @@ const amountVariants: Variants = {
   visible: {
     opacity: 1,
     // y: 0,
-    // transition: { duration: 0.1, ease: "easeOut" },
+    // transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.05, ease: "circIn" }, // 將此處的 duration 設為一個非常小的值，例如 0.05 秒
   },
   moveLeft: {
     x: -20,
     transition: {
       duration: 0.3,
       // ease: "easeOut",
-      // delay: 0.5,
+      delay: 0.5,
     },
   },
 };
@@ -125,7 +129,7 @@ const doubleVariants: Variants = {
     scale: [1, 1.7, 1],
     // transition: { duration: 0.7, ease: "easeOut" },
     transition: {
-      duration: 0.3, // 總持續時間 0.7 秒
+      duration: 0.4, // 總持續時間 0.7 秒
       times: [0, 0.385, 1], // 第一段佔 28.5%（約 0.2 秒），第二段佔剩下 71.5%（約 0.5 秒）
       ease: "easeInOut",
     },
@@ -237,8 +241,9 @@ const AnimationDemo: React.FC = () => {
       execute: async (controls: Record<ComponentType, AnimationControls>) => {
         try {
           // 先顯示金額容器
+          console.log("金額動畫開始開始", performance.now());
           await controls.amount.start("visible");
-          console.log("金額動畫已啟動");
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
           // 使用 Promise 來等待 CountUp 完成
           await new Promise<void>((resolve) => {
