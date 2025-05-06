@@ -35,6 +35,8 @@ export default function CountUp({
   const [animationStarted, setAnimationStarted] = useState(false);
   const motionValue = useMotionValue(direction === "down" ? to : from);
 
+  // 根據數值差距自動調整 damping/stiffness，讓動畫時間穩定
+  const valueRange = Math.abs(to - from);
   // 使用固定參數以提供更一致的動畫體驗
   //   const damping = 60; // 增加阻尼可以減少彈跳
   //   const stiffness = 250; // 增加剛性可以加快速度
@@ -44,8 +46,15 @@ export default function CountUp({
   const baseStiffness = 50;
   //   const damping = baseDamping + 40 * (1 / duration); // 調整阻尼計算
   //   const stiffness = baseStiffness * (1 / duration); // 調整剛性計算
-  const damping = baseDamping + 40 / Math.max(duration, 0.1);
-  const stiffness = baseStiffness + 200 / Math.max(duration, 0.1);
+  // const damping = baseDamping + 40 / Math.max(duration, 0.1);
+  // const stiffness = baseStiffness + 200 / Math.max(duration, 0.1);
+  // 讓數字差越大，damping/stiffness 也越大，動畫才不會拖太久
+  // const damping = baseDamping + valueRange / Math.max(duration, 0.1) / 10;
+  // const stiffness = baseStiffness + valueRange / Math.max(duration, 0.1) / 2;
+  // 使用對數或平方根讓大數字不會太快
+  const damping = baseDamping + Math.log10(valueRange + 10) * 10; // +10避免log(0)
+  // const stiffness = baseStiffness + Math.sqrt(valueRange) * 2;
+  const stiffness = Math.min(baseStiffness + Math.sqrt(valueRange) * 2, 180);
 
   const springValue = useSpring(motionValue, {
     damping,
