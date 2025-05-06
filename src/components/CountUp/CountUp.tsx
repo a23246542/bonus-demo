@@ -19,7 +19,7 @@ export default function CountUp({
   from = 0,
   direction = "up",
   delay = 0,
-  duration = 2, // Duration of the animation in seconds
+  duration = 2, // 參考用，實際由物理參數控制
   className = "",
   startWhen = true,
   separator = "",
@@ -31,30 +31,33 @@ export default function CountUp({
   const motionValue = useMotionValue(direction === "down" ? to : from);
 
   // 使用固定參數以提供更一致的動畫體驗
-  const damping = 50;
-  const stiffness = 170;
+  const damping = 60; // 增加阻尼可以減少彈跳
+  const stiffness = 250; // 增加剛性可以加快速度
+  const mass = 1; // 質量也會影響動畫
 
   const springValue = useSpring(motionValue, {
     damping,
     stiffness,
+    mass,
     // 增加最終值的精確性
-    restDelta: 0.01,
+    restDelta: 0.01, // 當速度小於此值時認為動畫停止
+    restSpeed: 0.01, // 當變化小於此值時認為動畫停止
   });
 
   const isInView = useInView(ref, { once: true, margin: "0px" });
 
-  // 設定初始文字內容 - 初始值不顯示在中間，直接顯示在終點位置
+  // 設定初始文字內容 - 初始時不顯示任何內容，避免閃現0
   useEffect(() => {
     if (ref.current) {
-      // 初始時不顯示任何內容，避免閃現0
       ref.current.textContent = "";
     }
   }, []);
 
-  // 用於追蹤動畫持續時間並強制完成
+  // 啟動動畫的 Effect
   useEffect(() => {
+    // 確保只有在元件可見、允許啟動且尚未啟動時執行
     if (isInView && startWhen && !animationStarted) {
-      setAnimationStarted(true);
+      setAnimationStarted(true); // 標記動畫已啟動
 
       if (typeof onStart === "function") {
         onStart();
@@ -79,78 +82,30 @@ export default function CountUp({
           : formattedNumber;
       }
 
-      // 開始動畫
+      // 使用 setTimeout 處理延遲
       const timeoutId = setTimeout(() => {
+        // 設定 motionValue 的目標值，觸發 useSpring 動畫
         motionValue.set(direction === "down" ? from : to);
       }, delay * 1000);
 
-      // 使用 requestAnimationFrame 和時間戳記來追蹤持續時間
-      let startTime: number | null = null;
-      let animationFrameId: number;
-
-      // 定義動畫進度計算函式
-      const animate = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / (duration * 1000), 1);
-
-        // 如果接近動畫結束，強制設定最終值
-        if (progress >= 0.95) {
-          // 直接設定最終值，避免動畫延遲
-          if (ref.current) {
-            const options = {
-              useGrouping: !!separator,
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
-            };
-
-            const formattedNumber = Intl.NumberFormat("en-US", options).format(
-              direction === "down" ? from : to
-            );
-
-            ref.current.textContent = separator
-              ? formattedNumber.replace(/,/g, separator)
-              : formattedNumber;
-          }
-
-          // 觸發結束回調
-          if (typeof onEnd === "function" && progress >= 0.99) {
-            onEnd();
-            return; // 停止動畫循環
-          }
-        }
-
-        // 繼續動畫循環直到完成
-        animationFrameId = requestAnimationFrame(animate);
-      };
-
-      // 延遲後開始動畫計時
-      const animationStartTimeoutId = setTimeout(() => {
-        animationFrameId = requestAnimationFrame(animate);
-      }, delay * 1000);
-
       return () => {
-        clearTimeout(timeoutId);
-        clearTimeout(animationStartTimeoutId);
-        cancelAnimationFrame(animationFrameId);
+        clearTimeout(timeoutId); // 清除計時器
       };
     }
   }, [
     isInView,
     startWhen,
+    animationStarted,
     motionValue,
     direction,
     from,
     to,
     delay,
     onStart,
-    onEnd,
-    duration,
-    animationStarted,
     separator,
   ]);
 
-  // 更新文字內容
+  // 監聽 springValue 的變化並更新 DOM
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
       if (ref.current) {
@@ -159,9 +114,10 @@ export default function CountUp({
           minimumFractionDigits: 0,
           maximumFractionDigits: 0,
         };
-
+        // 四捨五入到最接近的整數
+        const roundedValue = Math.round(latest);
         const formattedNumber = Intl.NumberFormat("en-US", options).format(
-          Number(latest.toFixed(0))
+          roundedValue
         );
 
         ref.current.textContent = separator
@@ -170,8 +126,35 @@ export default function CountUp({
       }
     });
 
-    return () => unsubscribe();
-  }, [springValue, separator]);
+    // 監聽動畫完成事件
+    const unsubscribeComplete = springValue.on("animationComplete", () => {
+      // 確保最終值被精確設定
+      if (ref.current) {
+        const finalValue = direction === "down" ? from : to;
+        const options = {
+          useGrouping: !!separator,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        };
+        const formattedNumber = Intl.NumberFormat("en-US", options).format(
+          finalValue
+        );
+        ref.current.textContent = separator
+          ? formattedNumber.replace(/,/g, separator)
+          : formattedNumber;
+      }
+      // 觸發 onEnd 回調
+      if (typeof onEnd === "function") {
+        onEnd();
+      }
+    });
+
+    // 清理函式
+    return () => {
+      unsubscribe();
+      unsubscribeComplete();
+    };
+  }, [springValue, separator, onEnd, direction, from, to]);
 
   return <span className={`${className}`} ref={ref} />;
 }
