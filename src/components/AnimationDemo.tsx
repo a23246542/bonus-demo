@@ -59,11 +59,17 @@ const apertureVariants: Variants = {
 
 // 背景動畫
 const backgroundVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
+  // hidden: { opacity: 0, scale: 0.8 },
+  // visible: {
+  //   opacity: 1,
+  //   scale: 1,
+  //   transition: { duration: 0.5, ease: "easeOut" },
+  // },
+  hidden: { opacity: 0, scale: 0.5 }, // 從較小的尺寸開始，如同 popup 出現
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { type: "spring", stiffness: 300, damping: 20 }, // 使用彈簧動畫達到popup效果
   },
 };
 
@@ -137,7 +143,7 @@ const containerVariants: Variants = {
   exit: {
     opacity: 0,
     scale: 0.8,
-    y: 20,
+    // y: 20,
     transition: { duration: 0.8, ease: "easeInOut" },
   },
 };
