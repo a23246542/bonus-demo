@@ -133,6 +133,9 @@ const AnimationDemo: React.FC = () => {
   // 控制 CountUp 動畫的啟動狀態
   const [startCountUp, setStartCountUp] = useState(false);
 
+  // 使用 useRef 存儲 CountUp 完成回調，避免不必要的重新渲染
+  const countUpCompleteRef = useRef<(() => void) | null>(null);
+
   // 內部管理 Lottie ref
   const lottieRef = useRef<LottieControlsRef>(null);
 
@@ -191,17 +194,29 @@ const AnimationDemo: React.FC = () => {
     // },
     {
       id: "金額階段",
-      timeout: 1300,
+      timeout: 3000, // 增加逾時時間，確保有足夠時間讓 CountUp 完成
       execute: async (controls: Record<ComponentType, AnimationControls>) => {
         try {
+          // 先顯示金額容器
           await controls.amount.start("visible");
           console.log("金額動畫已啟動");
 
-          // 金額 div 出現後，延遲一小段時間再啟動 CountUp 動畫
-          setTimeout(() => {
+          // 使用 Promise 來等待 CountUp 完成
+          await new Promise<void>((resolve) => {
+            // 將解析 Promise 的函式存儲到 ref 中
+            countUpCompleteRef.current = () => {
+              console.log("CountUp 動畫執行完畢 (在 Promise 內)");
+              resolve();
+            };
+
+            // 延遲一小段時間再啟動 CountUp 動畫
+            // setTimeout(() => {
             setStartCountUp(true);
             console.log("CountUp 動畫開始啟動");
-          }, 300);
+            // }, 300);
+          });
+
+          console.log("金額階段完全結束，準備進入下一階段");
         } catch (err) {
           console.error("金額動畫啟動失敗:", err);
           throw err;
@@ -495,11 +510,19 @@ const AnimationDemo: React.FC = () => {
               >
                 <CountUp
                   to={999999}
-                  duration={2}
+                  duration={3}
                   separator=","
                   startWhen={startCountUp}
                   onStart={() => console.log("CountUp 動畫開始執行")}
-                  onEnd={() => console.log("CountUp 動畫執行完畢")}
+                  onEnd={() => {
+                    console.log("CountUp 動畫執行完畢");
+                    // 使用 ref 存儲的回調函式
+                    if (countUpCompleteRef.current) {
+                      countUpCompleteRef.current();
+                      // 執行後清除引用
+                      countUpCompleteRef.current = null;
+                    }
+                  }}
                 />
               </motion.div>
             </motion.div>
