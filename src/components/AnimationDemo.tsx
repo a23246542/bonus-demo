@@ -142,13 +142,13 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5, ease: "easeIn" },
   },
   exit: {
     opacity: 0,
     scale: 0.8,
     // y: 20,
-    transition: { duration: 0.8, ease: "easeInOut" },
+    transition: { duration: 0.6, ease: "easeInOut" },
   },
 };
 
@@ -324,9 +324,9 @@ const AnimationDemo: React.FC = () => {
   useEffect(() => {
     if (isComplete) {
       const timer = setTimeout(() => {
-        // setShowContainer(false);
+        setShowContainer(false);
         console.log("動畫容器淡出中...");
-      }, 3000);
+      }, 0);
 
       return () => clearTimeout(timer);
     }
