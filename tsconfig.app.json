@@ -23,11 +23,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "outDir": "./out-tsc/app",
-    "types": [],
+    "types": ["node"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "files": ["vite-env.d.ts"],
+  "files": ["./src/vite-env.d.ts"],
   "include": ["src"]
 }

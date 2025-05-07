@@ -70,8 +70,8 @@ export function useAnimationSequence<T extends string>(
 
   // 重設所有控制器
   const resetAllControls = useCallback(() => {
-    Object.values(controlsMap).forEach((control) => {
-      control.set("hidden");
+    Object.entries(controlsMap).forEach(([_, control]) => {
+      (control as AnimationControls).set("hidden");
     });
     setVisibleComponents(new Set());
   }, [controlsMap]);
