@@ -596,7 +596,7 @@ const AnimationDemo: React.FC = () => {
       </AnimatePresence>
 
       {/* Lottie 控制按鈕 */}
-      <div className="absolute bottom-40 left-0 right-0 mx-auto flex justify-center gap-2">
+      {/* <div className="absolute bottom-40 left-0 right-0 mx-auto flex justify-center gap-2">
         <button
           onClick={playLottie}
           className="text-xs px-2 py-1 bg-blue-500 text-white rounded"
@@ -621,7 +621,7 @@ const AnimationDemo: React.FC = () => {
         >
           跳至30幀
         </button>
-      </div>
+      </div> */}
 
       {/* 動畫完成後顯示重設按鈕 */}
       {isComplete && showContainer && (
