@@ -541,7 +541,7 @@ const AnimationDemo: React.FC = () => {
                 animate={diceControls}
                 variants={diceVariants}
               >
-                <DiceGroup />
+                <DiceGroup diceValues={[1, 2, 3]} />
               </motion.div>
 
               {/* 金額 */}
