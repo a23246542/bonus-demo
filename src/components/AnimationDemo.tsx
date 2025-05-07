@@ -406,7 +406,7 @@ const AnimationDemo: React.FC = () => {
       <AnimatePresence>
         {showContainer && (
           <motion.div
-            className="container absolute top-0 left-0 right-0 bottom-0 outline outline-1 outline-red-600"
+            className="container absolute top-0 left-0 right-0 bottom-0"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
